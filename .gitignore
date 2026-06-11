@@ -1,2 +1,9 @@
 data/fitness.raw.json
+fitness/
+.playwright-mcp/
 .DS_Store
+
+# the dashboard-data skill is part of the repo (global gitignore hides .claude/)
+!.claude/
+.claude/*
+!.claude/skills/
