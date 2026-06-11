@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Dashboard de Malhar</title>
+  <style>
+    :root{
+      --bg:#090b12;--bg2:#101828;--card:#111827cc;--card2:#172033;--ink:#f8fafc;--muted:#94a3b8;--line:#263244;
+      --accent:#f97316;--accent2:#22c55e;--blue:#38bdf8;--red:#fb7185;--yellow:#facc15;--shadow:0 18px 60px rgba(0,0,0,.3)
+    }
+    *{box-sizing:border-box} body{margin:0;min-height:100vh;background:radial-gradient(circle at 18% 0,#3b1a05 0,#121827 34%,#090b12 72%);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.35} button,input{font:inherit}
+    header,.wrap,footer{max-width:1180px;margin:auto;padding-left:16px;padding-right:16px} header{padding-top:30px;padding-bottom:12px} h1{font-size:clamp(34px,7vw,64px);letter-spacing:-.055em;line-height:.95;margin:0} p{margin:7px 0 0;color:var(--muted)}
+    .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:stretch}.panel,.card,.login{background:linear-gradient(180deg,rgba(17,24,39,.9),rgba(15,23,42,.78));border:1px solid rgba(148,163,184,.15);border-radius:28px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.panel{padding:22px}.login{padding:18px;align-self:end}.login form{display:flex;gap:9px;margin-top:12px}.login input{min-width:0;flex:1;border:1px solid var(--line);background:#0b1220;color:var(--ink);border-radius:14px;padding:12px 13px;outline:none}.login button,.ghost{border:0;border-radius:14px;background:linear-gradient(135deg,var(--accent),#ef4444);color:white;font-weight:850;padding:12px 15px;cursor:pointer}.ghost{background:#202b3d;color:#e2e8f0}.error{color:#fda4af;font-weight:700;min-height:20px;margin-top:10px}.lock{font-size:34px}.hidden{display:none!important}
+    .toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0}.pill{border:1px solid rgba(148,163,184,.16);background:rgba(15,23,42,.72);border-radius:999px;padding:8px 11px;font-size:13px;color:#dbeafe}.dot{display:inline-block;width:9px;height:9px;border-radius:99px;margin-right:6px;background:var(--accent)}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;margin-top:16px}.card{padding:16px}.span-3{grid-column:span 3}.span-4{grid-column:span 4}.span-5{grid-column:span 5}.span-6{grid-column:span 6}.span-7{grid-column:span 7}.span-8{grid-column:span 8}.span-12{grid-column:span 12}.metric{font-size:34px;font-weight:950;letter-spacing:-.04em}.label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:850}.small{font-size:13px;color:var(--muted)} h2{font-size:20px;margin:0 0 12px;letter-spacing:-.02em} h3{font-size:15px;margin:0}.list{display:flex;flex-direction:column;gap:10px}.row{display:flex;gap:11px;align-items:flex-start;border-top:1px solid rgba(148,163,184,.12);padding-top:10px}.row:first-child{border-top:0;padding-top:0}.bar{width:5px;border-radius:99px;background:var(--accent);align-self:stretch;min-height:38px}.bar.green{background:var(--accent2)}.bar.blue{background:var(--blue)}.bar.red{background:var(--red)}.row-main{flex:1;min-width:0}.row strong{display:block}.tag{display:inline-flex;align-items:center;border:1px solid rgba(148,163,184,.16);border-radius:999px;padding:3px 8px;color:#cbd5e1;font-size:12px;margin-top:5px;background:rgba(15,23,42,.7)}
+    .bars{display:flex;flex-direction:column;gap:9px}.barline{display:grid;grid-template-columns:112px 1fr 42px;gap:9px;align-items:center;font-size:13px}.track{height:12px;background:#0b1220;border:1px solid rgba(148,163,184,.12);border-radius:999px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,var(--accent),#ef4444);border-radius:999px}.fill.green{background:linear-gradient(90deg,#16a34a,#86efac)}.fill.blue{background:linear-gradient(90deg,#0284c7,#7dd3fc)}
+    table{width:100%;border-collapse:collapse;font-size:13px} th,td{text-align:left;border-bottom:1px solid rgba(148,163,184,.12);padding:9px 6px;vertical-align:top} th{color:#cbd5e1;font-size:11px;text-transform:uppercase;letter-spacing:.07em}.search{width:100%;border:1px solid var(--line);background:#0b1220;color:var(--ink);border-radius:14px;padding:11px 12px;margin-bottom:10px;outline:none}.footer-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px} footer{padding-top:18px;padding-bottom:42px;font-size:12px;color:var(--muted)}
+    @media(max-width:880px){.hero{grid-template-columns:1fr}.span-3,.span-4,.span-5,.span-6,.span-7,.span-8{grid-column:span 12}.grid{gap:12px}.login form{flex-direction:column}.metric{font-size:29px}.barline{grid-template-columns:92px 1fr 32px}.card,.panel,.login{border-radius:22px}}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Dashboard de Malhar</h1>
+  <p>Métricas de CrossFit, PRs, mazelas e treinos recentes — cifrado no GitHub Pages.</p>
+</header>
+<main class="wrap">
+  <section id="unlock" class="hero">
+    <div class="panel">
+      <div class="lock">🔐💪</div>
+      <h2>Dados privados, site público.</h2>
+      <p>O GitHub só guarda um JSON cifrado. A password nunca sai deste browser; serve apenas para derivar a chave e decifrar localmente.</p>
+      <div class="toolbar">
+        <span class="pill"><span class="dot"></span>AES-GCM 256</span>
+        <span class="pill"><span class="dot"></span>PBKDF2 SHA-256</span>
+        <span class="pill"><span class="dot"></span>Sem backend</span>
+      </div>
+    </div>
+    <div class="login">
+      <h2>Entrar</h2>
+      <p>Password dos músculos.</p>
+      <form id="unlockForm">
+        <input id="password" type="password" autocomplete="current-password" placeholder="Password" autofocus />
+        <button>Decifrar</button>
+      </form>
+      <div class="error" id="error"></div>
+    </div>
+  </section>
+
+  <section id="app" class="hidden">
+    <div class="toolbar">
+      <span class="pill"><span class="dot"></span><span id="generatedAt">Dados carregados</span></span>
+      <span class="pill"><span class="dot"></span>Fonte: ficheiros locais de fitness</span>
+      <button class="ghost" id="lockAgain" type="button">Bloquear</button>
+    </div>
+    <section class="grid">
+      <article class="card span-3"><div class="label">Exercícios com max</div><div class="metric" id="mStrength">–</div><p>Barbell / CrossFit registado.</p></article>
+      <article class="card span-3"><div class="label">Treinos recentes</div><div class="metric" id="mWorkouts">–</div><p>Histórico manual guardado.</p></article>
+      <article class="card span-3"><div class="label">PRs registados</div><div class="metric" id="mPrs">–</div><p>Entradas no PR history.</p></article>
+      <article class="card span-3"><div class="label">Atenções activas</div><div class="metric" id="mIssues">–</div><p>Mazelas recentes para aquecer bem.</p></article>
+
+      <article class="card span-7"><h2>Top lifts</h2><div class="bars" id="topStrength"></div></article>
+      <article class="card span-5"><h2>Últimos highlights</h2><div class="list" id="highlights"></div></article>
+
+      <article class="card span-6"><h2>PRs recentes</h2><div class="list" id="prs"></div></article>
+      <article class="card span-6"><h2>Reminder das mazelas</h2><div class="list" id="body"></div></article>
+
+      <article class="card span-6"><h2>Treinos recentes</h2><div class="list" id="workouts"></div></article>
+      <article class="card span-6"><h2>Grupos musculares detectados</h2><div class="bars" id="muscles"></div></article>
+
+      <article class="card span-12"><h2>Todos os máximos</h2><input class="search" id="search" placeholder="Filtrar exercício…" /><div style="overflow:auto"><table><thead><tr><th>Exercício</th><th>Máximos</th><th>Último teste</th><th>Notas</th></tr></thead><tbody id="allStrength"></tbody></table></div></article>
+    </section>
+  </section>
+</main>
+<footer>Não é uma app médica nem uma fonte oficial. Se o ombro se queixar, não armes em herói.</footer>
+<script>
+const DATA_URL = 'data/fitness.encrypted.json';
+const $ = (id) => document.getElementById(id);
+const dec = new TextDecoder();
+const enc = new TextEncoder();
+const b64ToBytes = (s) => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString('pt-PT', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+const esc = (s='') => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+async function decryptPayload(password){
+  const payload = await fetch(DATA_URL, { cache:'no-store' }).then(r => { if(!r.ok) throw new Error('Não consegui carregar o JSON cifrado.'); return r.json(); });
+  const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+  const key = await crypto.subtle.deriveKey(
+    { name:'PBKDF2', salt:b64ToBytes(payload.kdf.salt), iterations:payload.kdf.iterations, hash:payload.kdf.hash },
+    keyMaterial,
+    { name:'AES-GCM', length:256 },
+    false,
+    ['decrypt']
+  );
+  const plain = await crypto.subtle.decrypt({ name:'AES-GCM', iv:b64ToBytes(payload.cipher.iv) }, key, b64ToBytes(payload.ciphertext));
+  return JSON.parse(dec.decode(plain));
+}
+
+function barRows(rows, valueKey='bestWeight', color=''){
+  const max = Math.max(...rows.map(r => Number(r[valueKey]) || 0), 1);
+  return rows.map(r => `<div class="barline"><strong>${esc(r.name)}</strong><div class="track"><div class="fill ${color}" style="width:${Math.max(4,((Number(r[valueKey])||0)/max)*100)}%"></div></div><span>${esc(r[valueKey])}</span></div>`).join('');
+}
+function renderList(rows, template, empty='Sem dados.'){ return rows?.length ? rows.map(template).join('') : `<p class="small">${empty}</p>`; }
+function render(data){
+  $('generatedAt').textContent = `Gerado: ${fmtDate(data.meta.generatedAt)}`;
+  $('mStrength').textContent = data.summary.strengthExercises;
+  $('mWorkouts').textContent = data.summary.recentWorkouts;
+  $('mPrs').textContent = data.summary.prs;
+  $('mIssues').textContent = data.summary.activeIssues;
+  $('topStrength').innerHTML = barRows(data.topStrength || []);
+  $('highlights').innerHTML = renderList([
+    data.summary.latestWorkout && {kind:'Último treino', ...data.summary.latestWorkout, color:'green'},
+    data.summary.latestPr && {kind:'Último PR', workout:`${data.summary.latestPr.exercise} — ${data.summary.latestPr.weight}kg x${data.summary.latestPr.reps}`, date:data.summary.latestPr.date, notes:data.summary.latestPr.notes, color:'blue'}
+  ].filter(Boolean), h => `<div class="row"><div class="bar ${h.color}"></div><div class="row-main"><strong>${esc(h.kind)} · ${fmtDate(h.date)}</strong><div>${esc(h.workout || '')}</div><span class="small">${esc(h.result || h.notes || '')}</span></div></div>`);
+  $('prs').innerHTML = renderList((data.prs||[]).slice(0,6), pr => `<div class="row"><div class="bar blue"></div><div class="row-main"><strong>${esc(pr.exercise)} · ${pr.weight}kg x${pr.reps}</strong><span class="small">${fmtDate(pr.date)} — ${esc(pr.notes || '')}</span></div></div>`);
+  $('body').innerHTML = renderList((data.body.entries||[]).slice(0,6), b => `<div class="row"><div class="bar red"></div><div class="row-main"><strong>${esc(b.area)} · ${esc(b.severity || '')}</strong><span class="small">${fmtDate(b.date)} — ${esc(b.notes || '')}</span><br><span class="tag">${esc(b.exercise || b.type || 'atenção')}</span></div></div>`);
+  $('workouts').innerHTML = renderList((data.recentWorkouts||[]).slice(0,6), w => `<div class="row"><div class="bar green"></div><div class="row-main"><strong>${fmtDate(w.date)} · ${esc(w.type || 'treino')}</strong><div>${esc(w.workout || '')}</div><span class="small">${esc(w.result || w.weights || w.notes || '')}</span></div></div>`);
+  $('muscles').innerHTML = barRows((data.muscleCounts||[]).slice(0,10), 'count', 'green');
+  const drawTable = () => {
+    const q = $('search').value.trim().toLowerCase();
+    $('allStrength').innerHTML = (data.allStrength||[]).filter(r => !q || r.name.toLowerCase().includes(q)).map(r => `<tr><td><strong>${esc(r.name)}</strong></td><td>${r.maxes.map(m => `<span class="tag">${esc(m.label)} ${m.weight}kg</span>`).join(' ')}</td><td>${fmtDate(r.lastTest)}</td><td class="small">${esc(r.notes)}</td></tr>`).join('');
+  };
+  $('search').oninput = drawTable; drawTable();
+  $('unlock').classList.add('hidden'); $('app').classList.remove('hidden');
+}
+
+$('unlockForm').addEventListener('submit', async (e) => {
+  e.preventDefault(); $('error').textContent = 'A decifrar…';
+  try { render(await decryptPayload($('password').value)); $('error').textContent = ''; }
+  catch (err) { $('error').textContent = 'Password errada ou dados corrompidos. Braços fracos não passam.'; console.warn(err); }
+});
+$('lockAgain').addEventListener('click', () => { $('password').value=''; $('app').classList.add('hidden'); $('unlock').classList.remove('hidden'); $('password').focus(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "fitness-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:data": "node scripts/build-data.mjs && node scripts/encrypt-data.mjs",
+    "serve": "python3 -m http.server 8080"
+  }
+}
