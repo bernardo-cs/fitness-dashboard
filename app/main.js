@@ -41,7 +41,7 @@ const NAV = [
   { id: 'today', label: 'Today', icon: icons.sun },
   { id: 'overview', label: 'Overview', icon: icons.grid },
   { id: 'strength', label: 'Strength', icon: icons.barbell },
-  { id: 'body', label: 'Body & Recovery', icon: icons.pulse }
+  { id: 'body', label: 'Body & Recovery', short: 'Body', icon: icons.pulse }
 ];
 
 function loadTweaks() {
@@ -126,6 +126,9 @@ function settingsPanel() {
           Show estimated 1RMs
         </label>
       </div>
+      ${state.data ? `<div class="settings-row">
+        <button class="settings-lock" type="button" data-lock>Lock dashboard</button>
+      </div>` : ''}
     </div>` : ''}
     <button class="settings-fab" data-settings-toggle aria-label="Display settings" title="Display settings">${icons.gear}</button>
   `;
@@ -164,7 +167,7 @@ function appShell() {
           <div class="brand-sub">Training data</div>
         </div>
       </div>
-      ${NAV.map(n => `<button class="nav-item${view === n.id ? ' active' : ''}" data-nav="${n.id}">${n.icon}${esc(n.label)}</button>`).join('')}
+      ${NAV.map(n => `<button class="nav-item${view === n.id ? ' active' : ''}" data-nav="${n.id}">${n.icon}<span class="nav-label">${esc(n.label)}</span><span class="nav-label-sm">${esc(n.short || n.label)}</span></button>`).join('')}
       <div class="sidebar-foot">
         <span>Generated ${FT.fmtDate(data.meta.generatedAt.slice(0, 10))} · kg</span>
         <button class="lock-btn" data-lock>Lock dashboard</button>
@@ -186,7 +189,9 @@ let rememberDraft = false;
 
 function render() {
   applyTheme();
-  root.innerHTML = (state.data ? appShell() : lockScreen()) + settingsPanel();
+  // No settings FAB/panel while the lift drawer is open — the raised mobile FAB
+  // would float over the drawer's bottom content with no way to scroll it clear.
+  root.innerHTML = (state.data ? appShell() : lockScreen()) + (state.openLift ? '' : settingsPanel());
   if (!state.data) {
     const input = root.querySelector('#passInput');
     const remember = root.querySelector('#rememberBox');
@@ -235,6 +240,26 @@ root.addEventListener('change', e => {
 
 window.addEventListener('keydown', e => {
   if (e.key === 'Escape' && state.openLift) { state.openLift = null; render(); }
+});
+
+// Re-render on width changes so the drawer chart picks the right size.
+// The chart is the only width-dependent render output, so skip the re-render
+// (and the scroll/focus loss it causes) unless its width would actually change.
+let lastWidth = window.innerWidth, resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const w = window.innerWidth;
+    if (w === lastWidth) return; // iOS fires resize on URL-bar show/hide (height-only)
+    const chartChanged = FT.chartWidth(w) !== FT.chartWidth(lastWidth);
+    lastWidth = w;
+    if (!state.data || !state.openLift || !chartChanged) return;
+    const body = root.querySelector('.drawer-body');
+    const scroll = body ? body.scrollTop : 0;
+    render();
+    const fresh = root.querySelector('.drawer-body');
+    if (fresh) fresh.scrollTop = scroll;
+  }, 150);
 });
 
 fetch('data/fitness.encrypted.json', { cache: 'no-store' })

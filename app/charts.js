@@ -11,7 +11,7 @@ export function sparkline(points, width = 92, height = 26) {
   const y = w => height - pad - ((w - min) / span) * (height - pad * 2);
   const d = points.map((p, i) => `${x(i).toFixed(1)},${y(p.weight).toFixed(1)}`).join(' ');
   const last = points[points.length - 1];
-  return `<svg width="${width}" height="${height}" style="color:var(--accent);display:block">
+  return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="color:var(--accent);display:block;max-width:100%;height:auto">
     <polyline points="${d}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"></polyline>
     <circle cx="${x(points.length - 1)}" cy="${y(last.weight)}" r="2.4" fill="currentColor"></circle>
   </svg>`;
@@ -39,7 +39,7 @@ export function lineChart(points, width = 412, height = 218) {
   const fmtD = t => new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   const d = points.map((p, i) => `${x(ts[i]).toFixed(1)},${y(p.weight).toFixed(1)}`).join(' ');
   const labelAll = points.length <= 6;
-  return `<svg width="${width}" height="${height}" style="max-width:100%;display:block">
+  return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="max-width:100%;height:auto;display:block">
     ${ticks.map(v => `<g>
       <line x1="${m.l}" x2="${width - m.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--border)" stroke-width="1"></line>
       <text x="${m.l - 8}" y="${y(v) + 3.5}" text-anchor="end" font-size="10.5" fill="var(--muted)">${v}</text>

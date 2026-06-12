@@ -112,8 +112,8 @@ export function overviewView(data, tweaks) {
           const lift = liftByKey(p.exercise);
           return `<div class="list-row${lift ? ' clickable' : ''}"${lift ? ` data-open-lift="${esc(lift.key)}"` : ''}>
             <span class="list-date">${FT.fmtDateShort(p.date)}</span>
-            <span class="lift-name" style="width:170px;flex-shrink:0">${esc(FT.titleCase(p.exercise))}</span>
-            <span class="num" style="font-weight:600;width:90px;flex-shrink:0">
+            <span class="lift-name list-lift">${esc(FT.titleCase(p.exercise))}</span>
+            <span class="num list-weight">
               ${FT.fmtKg(p.weight)}${p.reps ? `<span class="cell-muted"> × ${esc(p.reps)}</span>` : ''}
             </span>
             <span class="list-note">${esc(p.notes)}</span>
@@ -232,7 +232,7 @@ export function liftDrawer(lift, data, tweaks) {
 
         <div class="drawer-section">
           ${sectionTitle('Progression')}
-          ${lineChart(pts)}
+          ${lineChart(pts, FT.chartWidth(window.innerWidth))}
         </div>
 
         ${eff ? `<div class="drawer-section">
@@ -255,7 +255,7 @@ export function liftDrawer(lift, data, tweaks) {
           <div class="card">
             ${[...pts].reverse().map(h => `<div class="list-row">
               <span class="list-date">${FT.fmtDateShort(h.date)}</span>
-              <span class="num" style="font-weight:600;width:86px;flex-shrink:0">
+              <span class="num list-weight">
                 ${FT.fmtKg(h.weight)}${h.reps ? `<span class="cell-muted"> × ${esc(h.reps)}</span>` : ''}
               </span>
               ${h.src === 'pr' ? chip('PR', 'good') : ''}
@@ -295,8 +295,8 @@ export function bodyView(data) {
           const sev = FT.severity(e.severity);
           return `<div class="list-row" style="align-items:flex-start">
             <span class="list-date">${FT.fmtDateShort(e.date)}</span>
-            <span style="width:110px;flex-shrink:0">${chip(esc(sev.label), sev.cls)}</span>
-            <span style="flex:1;min-width:0">
+            <span class="list-sev">${chip(esc(sev.label), sev.cls)}</span>
+            <span class="list-main">
               <span class="lift-name">${esc(FT.areaLabel(e.area))}</span>
               <span class="cell-muted"> · ${esc(e.type)} · ${esc(FT.titleCase(e.exercise))}</span>
               <div class="chronic-notes" style="margin-top:4px">${esc(e.notes)}</div>

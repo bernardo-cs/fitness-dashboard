@@ -73,6 +73,10 @@ export const FT = {
 
   roundTo(w, inc) { return Math.round(w / inc) * inc; },
 
+  // Drawer chart width for a given viewport width: full 412px on desktop,
+  // viewport minus drawer padding on phones, never below 260.
+  chartWidth(w) { return Math.max(260, Math.min(412, w - 48)); },
+
   severity(s) {
     const map = {
       'leve': { label: 'mild', cls: '' },
