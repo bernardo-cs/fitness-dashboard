@@ -6,6 +6,7 @@ import { todayView, overviewView, strengthView, liftDrawer, bodyView } from './v
 const PASS_KEY = 'ftd_passphrase';
 const TWEAKS_KEY = 'ftd_tweaks';
 const TWEAK_DEFAULTS = { theme: 'Notion', staleMonths: 3, rounding: '2.5 kg', showEst: true };
+const DATA_URL = 'data/fitness.encrypted.json';
 
 const icons = {
   sun: `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
@@ -58,6 +59,9 @@ const state = {
   panelOpen: false,
   tweaks: loadTweaks(),
   busy: false,
+  refreshing: false,
+  refreshMessage: '',
+  lastCheckedAt: null,
   lockError: null,
   triedSaved: false
 };
@@ -70,6 +74,25 @@ function setTweak(key, value) {
 
 function applyTheme() {
   document.documentElement.dataset.theme = (state.tweaks.theme || 'Notion').toLowerCase();
+}
+
+function fmtDateTime(iso) {
+  if (!iso) return 'unknown';
+  return new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
+    timeZone: 'Europe/Lisbon'
+  }).format(new Date(iso));
+}
+
+function fmtChecked(iso) {
+  if (!iso) return 'not checked yet';
+  return new Intl.DateTimeFormat('en-GB', {
+    hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Europe/Lisbon'
+  }).format(new Date(iso));
+}
+
+function savedPass() {
+  return sessionStorage.getItem(PASS_KEY) || localStorage.getItem(PASS_KEY) || '';
 }
 
 async function attempt(pass, manual, remember) {
@@ -155,6 +178,20 @@ function lockScreen() {
   </div>`;
 }
 
+function updateStatus() {
+  const generated = state.data?.meta?.generatedAt;
+  const msg = state.refreshMessage ? `<span class="update-msg">${esc(state.refreshMessage)}</span>` : '';
+  return `<div class="update-strip">
+    <div>
+      <span class="update-dot"></span>
+      <span>Updated ${esc(fmtDateTime(generated))}</span>
+      <span class="update-muted">· checked ${esc(fmtChecked(state.lastCheckedAt))}</span>
+      ${msg}
+    </div>
+    <button class="refresh-btn" type="button" data-refresh ${state.refreshing ? 'disabled' : ''}>${state.refreshing ? 'Checking…' : 'Check updates'}</button>
+  </div>`;
+}
+
 function appShell() {
   const { data, view, tweaks } = state;
   const liftObj = data.strength.find(l => l.key === state.openLift) || null;
@@ -169,11 +206,13 @@ function appShell() {
       </div>
       ${NAV.map(n => `<button class="nav-item${view === n.id ? ' active' : ''}" data-nav="${n.id}">${n.icon}<span class="nav-label">${esc(n.label)}</span><span class="nav-label-sm">${esc(n.short || n.label)}</span></button>`).join('')}
       <div class="sidebar-foot">
-        <span>Generated ${FT.fmtDate(data.meta.generatedAt.slice(0, 10))} · kg</span>
+        <span>Updated ${esc(fmtDateTime(data.meta.generatedAt))} · kg</span>
+        <button class="refresh-side" data-refresh type="button" ${state.refreshing ? 'disabled' : ''}>${state.refreshing ? 'Checking…' : 'Check updates'}</button>
         <button class="lock-btn" data-lock>Lock dashboard</button>
       </div>
     </nav>
     <main class="content">
+      ${updateStatus()}
       ${view === 'today' ? todayView(data) : ''}
       ${view === 'overview' ? overviewView(data, tweaks) : ''}
       ${view === 'strength' ? strengthView(data, tweaks) : ''}
@@ -213,13 +252,14 @@ function render() {
 }
 
 root.addEventListener('click', e => {
-  const t = e.target.closest('[data-nav],[data-open-lift],[data-close-drawer],[data-lock],[data-settings-toggle],[data-tweak-theme],[data-tweak-rounding]');
+  const t = e.target.closest('[data-nav],[data-open-lift],[data-close-drawer],[data-lock],[data-settings-toggle],[data-tweak-theme],[data-tweak-rounding],[data-refresh]');
   if (!t) return;
   if (t.dataset.nav) { state.view = t.dataset.nav; state.openLift = null; render(); }
   else if (t.dataset.openLift) { state.openLift = t.dataset.openLift; state.view = 'strength'; render(); }
   else if ('closeDrawer' in t.dataset) { state.openLift = null; render(); }
   else if ('lock' in t.dataset) { lock(); }
   else if ('settingsToggle' in t.dataset) { state.panelOpen = !state.panelOpen; render(); }
+  else if ('refresh' in t.dataset) { refreshData(true); }
   else if (t.dataset.tweakTheme) { setTweak('theme', t.dataset.tweakTheme); }
   else if (t.dataset.tweakRounding) { setTweak('rounding', t.dataset.tweakRounding); }
 });
@@ -262,17 +302,57 @@ window.addEventListener('resize', () => {
   }, 150);
 });
 
-fetch('data/fitness.encrypted.json', { cache: 'no-store' })
-  .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-  .then(enc => {
+async function refreshData(manual = false) {
+  if (state.refreshing) return;
+  state.refreshing = true;
+  if (manual) state.refreshMessage = '';
+  render();
+  try {
+    const before = state.data?.meta?.generatedAt || null;
+    const r = await fetch(`${DATA_URL}?v=${Date.now()}`, { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const enc = await r.json();
     state.enc = enc;
-    render();
-    if (!state.triedSaved) {
+    state.loadError = null;
+    state.lastCheckedAt = new Date().toISOString();
+
+    const pass = savedPass();
+    if (state.data && pass) {
+      const payload = await decryptFitnessPayload(pass, enc);
+      state.data = payload;
+      state.view = payload.today ? state.view : (state.view === 'today' ? 'overview' : state.view);
+      const after = payload.meta?.generatedAt || null;
+      state.refreshMessage = before && after && before !== after ? 'New data loaded' : (manual ? 'Already up to date' : '');
+      setTimeout(() => { state.refreshMessage = ''; render(); }, 3500);
+    } else if (!state.data && !state.triedSaved) {
       state.triedSaved = true;
-      const saved = sessionStorage.getItem(PASS_KEY) || localStorage.getItem(PASS_KEY);
-      if (saved) attempt(saved, false, false);
+      const saved = savedPass();
+      if (saved) await attempt(saved, false, false);
     }
-  })
-  .catch(() => { state.loadError = 'Could not load data/fitness.encrypted.json'; render(); });
+  } catch (e) {
+    if (!state.data) state.loadError = `Could not load ${DATA_URL}`;
+    state.refreshMessage = manual ? 'Could not check updates' : '';
+  } finally {
+    state.refreshing = false;
+    render();
+  }
+}
+
+// Lightweight pull-to-refresh for the mobile web app. Native browser pull-to-refresh
+// still works; this gives feedback and reloads just the encrypted data file.
+let pullStartY = null;
+window.addEventListener('touchstart', e => {
+  const content = root.querySelector('.content');
+  if (!state.data || !content || content.scrollTop > 0 || e.touches.length !== 1) return;
+  pullStartY = e.touches[0].clientY;
+}, { passive: true });
+window.addEventListener('touchend', e => {
+  if (pullStartY == null || !state.data) { pullStartY = null; return; }
+  const dy = (e.changedTouches[0]?.clientY || 0) - pullStartY;
+  pullStartY = null;
+  if (dy > 90) refreshData(true);
+}, { passive: true });
+
+refreshData(false).finally(() => render());
 
 render();

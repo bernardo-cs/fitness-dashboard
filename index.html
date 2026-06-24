@@ -101,6 +101,32 @@
   .lock-btn:hover { background: var(--sb-hover); color: var(--sb-active-text); }
 
   .content { flex: 1; overflow-y: auto; }
+  .update-strip {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 10px 48px; border-bottom: 1px solid var(--border);
+    background: color-mix(in oklab, var(--bg) 92%, transparent);
+    backdrop-filter: blur(14px); color: var(--muted); font-size: 12.5px;
+  }
+  .update-dot {
+    display: inline-block; width: 7px; height: 7px; border-radius: 999px;
+    background: var(--good); margin-right: 7px; vertical-align: 1px;
+  }
+  .update-muted { color: color-mix(in oklab, var(--muted) 74%, transparent); }
+  .update-msg {
+    margin-left: 8px; color: var(--accent); font-weight: 600;
+  }
+  .refresh-btn, .refresh-side {
+    border: 1px solid var(--border); background: var(--card); color: var(--text);
+    border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 600;
+    cursor: pointer; white-space: nowrap;
+  }
+  .refresh-btn:hover, .refresh-side:hover { background: var(--hover); }
+  .refresh-btn:disabled, .refresh-side:disabled { opacity: 0.6; cursor: default; }
+  .refresh-side {
+    border-color: var(--sb-border); background: transparent; color: var(--sb-text);
+    border-radius: 6px; width: fit-content;
+  }
   .page { max-width: 1000px; margin: 0 auto; padding: 40px 48px 90px; }
   .page-title { font-size: 26px; font-weight: 700; margin: 0 0 4px; letter-spacing: -0.01em; }
   .page-meta { color: var(--muted); font-size: 13px; margin: 0 0 30px; }
@@ -304,6 +330,15 @@
     /* Settings FAB + panel float above the tab bar */
     .settings-fab { bottom: calc(62px + env(safe-area-inset-bottom)); right: 14px; }
     .settings-panel { bottom: calc(108px + env(safe-area-inset-bottom)); right: 14px; max-width: calc(100vw - 28px); }
+
+    .update-strip {
+      padding: 9px 16px; font-size: 11.5px; align-items: flex-start;
+      position: sticky; top: 0;
+    }
+    .update-strip > div { min-width: 0; line-height: 1.4; }
+    .update-muted { display: block; margin-left: 14px; }
+    .update-msg { display: block; margin: 2px 0 0 14px; }
+    .refresh-btn { padding: 5px 9px; font-size: 11.5px; }
 
     .page { padding: 22px 16px calc(86px + env(safe-area-inset-bottom)); }
     .page-title { font-size: 22px; }
